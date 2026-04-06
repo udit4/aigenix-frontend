@@ -62,6 +62,8 @@
 .table-container {
   width: 100%;
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 65vh;
   margin-top: 16px;
 }
 .data-table {
@@ -77,6 +79,10 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid var(--border-glass);
+  position: sticky;
+  top: 0;
+  background: var(--bg-primary);
+  z-index: 10;
 }
 .data-table td {
   padding: 20px 16px;

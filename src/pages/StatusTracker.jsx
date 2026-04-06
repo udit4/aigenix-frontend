@@ -76,7 +76,7 @@ function StatusTracker() {
           <div className="loader-box glass-panel">
             <RefreshCw size={36} className="spin" color="var(--accent-blue)" />
             <h3 style={{marginTop: '20px', fontSize: '18px'}}>Syncing Database...</h3>
-            <p style={{color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px'}}>Fetching latest leadership initiatives</p>
+            <p style={{color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px'}}>Fetching latest AIGenix initiatives</p>
           </div>
         </div>
       )}
@@ -171,10 +171,8 @@ function StatusTracker() {
                     <div className="project-bu">{row['Business Unit']}</div>
                   </td>
                   <td>
-                    <div className="business-obj" title={row['Business Objective']}>
-                      {row['Business Objective']?.length > 140 
-                        ? row['Business Objective'].substring(0, 140) + '...' 
-                        : row['Business Objective'] || '-'}
+                    <div className="business-obj">
+                      {row['Business Objective'] || '-'}
                     </div>
                   </td>
                   <td>
