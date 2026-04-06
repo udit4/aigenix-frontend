@@ -1,0 +1,146 @@
+/* Scoped layout styles for App.jsx core structure */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Header Area */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.last-refresh {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* KPI Cards Layout */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.kpi-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.kpi-title {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.kpi-value {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+}
+.kpi-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Data Table Container */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.data-table th {
+  padding: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-glass);
+}
+.data-table td {
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 14px;
+  vertical-align: top;
+}
+.project-name {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+.project-bu {
+  font-size: 12px;
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+.business-obj {
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 400px;
+}
+.team-details {
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+.geo-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.spin {
+  animation: spin-anim 1s linear infinite;
+}
+@keyframes spin-anim {
+  100% { transform: rotate(360deg); }
+}
+
+/* Full Screen Overlay Loader */
+.overlay-loader {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 18, 26, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loader-box {
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-top: 3px solid var(--accent-blue);
+  animation: fade-in 0.3s ease-out;
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

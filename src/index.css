@@ -1,0 +1,104 @@
+:root {
+  /* Core Palette */
+  --bg-primary: #0F121A;
+  --bg-card: rgba(22, 27, 34, 0.45);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --text-main: #FFFFFF;
+  --text-muted: #8A94A6;
+  
+  /* Brand/Accents */
+  --accent-blue: #3E8BFF;
+  --accent-green: #22C55E;
+  --accent-yellow: #F59E0B;
+  --accent-purple: #8B5CF6;
+  
+  --font-base: 'Inter', system-ui, sans-serif;
+}
+
+/* Light Mode Variables Override */
+body.light-mode {
+  --bg-primary: #F8FAFC;
+  --bg-card: rgba(255, 255, 255, 0.7);
+  --border-glass: rgba(0, 0, 0, 0.1);
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --accent-green: #16a34a;
+}
+
+body.light-mode .glass-panel {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+body.light-mode .status-pill, 
+body.light-mode .geo-tag {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-base);
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism Generic Card */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+}
+
+/* Glowing text utilities */
+.glow-blue { color: var(--accent-blue); text-shadow: 0 0 16px rgba(62, 139, 255, 0.4); }
+.glow-green { color: var(--accent-green); text-shadow: 0 0 16px rgba(34, 197, 94, 0.4); }
+.glow-yellow { color: var(--accent-yellow); text-shadow: 0 0 16px rgba(245, 158, 11, 0.4); }
+.glow-purple { color: var(--accent-purple); text-shadow: 0 0 16px rgba(139, 92, 246, 0.4); }
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--accent-purple);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.btn-primary:hover {
+  background-color: #7c4dff;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+}
+
+/* Status Pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05); /* very faint */
+  border: 1px solid var(--border-glass);
+}
+.status-pill.green { color: var(--accent-green); }
+.status-pill.yellow { color: var(--accent-yellow); }
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.status-dot.green { background-color: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+.status-dot.yellow { background-color: var(--accent-yellow); box-shadow: 0 0 6px var(--accent-yellow); }
