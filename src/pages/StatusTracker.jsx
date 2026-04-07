@@ -8,6 +8,8 @@ function StatusTracker() {
   const [error, setError] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [selectedGeo, setSelectedGeo] = useState('All');
+  const [selectedBU, setSelectedBU] = useState('All Projects');
 
   // Apply theme class to body
   useEffect(() => {
@@ -66,6 +68,22 @@ function StatusTracker() {
         uniqueGeos.add(geo.trim());
       });
     }
+  });
+
+  // Dynamically compute Business Unit counts
+  const buCounts = { 'All Projects': data.length };
+  data.forEach(d => {
+    const bu = d['Business Unit'];
+    if (bu) {
+      buCounts[bu] = (buCounts[bu] || 0) + 1;
+    }
+  });
+  const uniqueBUs = Object.keys(buCounts).filter(k => k !== 'All Projects').sort();
+
+  const filteredData = data.filter(row => {
+    const matchGeo = selectedGeo === 'All' || (row.Geo && row.Geo.split(',').map(g => g.trim()).includes(selectedGeo));
+    const matchBU = selectedBU === 'All Projects' || row['Business Unit'] === selectedBU;
+    return matchGeo && matchBU;
   });
 
   return (
@@ -145,9 +163,83 @@ function StatusTracker() {
         </div>
       </section>
 
+      {/* GEO FILTER */}
+      <section style={{display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', flexWrap: 'wrap'}}>
+        <span style={{color: 'var(--text-muted)', fontSize: '14px', fontWeight: 600, marginRight: '4px', letterSpacing: '0.5px'}}>GEO:</span>
+        <button 
+          onClick={() => setSelectedGeo('All')}
+          style={{
+            background: selectedGeo === 'All' ? 'var(--accent-blue)' : 'var(--bg-card)',
+            color: selectedGeo === 'All' ? '#fff' : 'var(--text-muted)',
+            border: `1px solid ${selectedGeo === 'All' ? 'var(--accent-blue)' : 'var(--border-glass)'}`,
+            padding: '8px 24px', borderRadius: '24px', cursor: 'pointer', fontSize: '15px', fontWeight: 500, transition: 'all 0.2s', backdropFilter: 'blur(4px)'
+          }}
+        >
+          All
+        </button>
+        {Array.from(uniqueGeos).sort().map(geo => (
+          <button 
+            key={geo}
+            onClick={() => setSelectedGeo(geo)}
+            style={{
+              background: selectedGeo === geo ? 'var(--accent-blue)' : 'var(--bg-card)',
+              color: selectedGeo === geo ? '#fff' : 'var(--text-muted)',
+              border: `1px solid ${selectedGeo === geo ? 'var(--accent-blue)' : 'var(--border-glass)'}`,
+              padding: '8px 24px', borderRadius: '24px', cursor: 'pointer', fontSize: '15px', fontWeight: 500, transition: 'all 0.2s', backdropFilter: 'blur(4px)'
+            }}
+          >
+            {geo}
+          </button>
+        ))}
+      </section>
+
       {/* DATA TABLE */}
       <section className="table-container glass-panel">
-        <table className="data-table">
+        
+        {/* BU TABS */}
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', padding: '0 8px', overflowX: 'auto' }}>
+          <div 
+            onClick={() => setSelectedBU('All Projects')}
+            style={{ 
+              padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
+              borderBottom: selectedBU === 'All Projects' ? '2px solid var(--accent-blue)' : '2px solid transparent',
+              color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
+              fontWeight: 600, fontSize: '14px', transition: 'all 0.2s', whiteSpace: 'nowrap'
+            }}
+          >
+            All Projects
+            <span style={{ 
+              background: selectedBU === 'All Projects' ? 'rgba(62, 139, 255, 0.15)' : 'rgba(255,255,255,0.08)', 
+              color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
+              padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
+            }}>
+              {buCounts['All Projects']}
+            </span>
+          </div>
+          {uniqueBUs.map(bu => (
+            <div 
+              key={bu}
+              onClick={() => setSelectedBU(bu)}
+              style={{ 
+                padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
+                borderBottom: selectedBU === bu ? '2px solid var(--accent-blue)' : '2px solid transparent',
+                color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
+                fontWeight: 600, fontSize: '14px', transition: 'all 0.2s', whiteSpace: 'nowrap'
+              }}
+            >
+              {bu}
+              <span style={{ 
+                background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : 'rgba(255,255,255,0.08)', 
+                color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
+                padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
+              }}>
+                {buCounts[bu]}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <table className="data-table" style={{ marginTop: '0' }}>
           <thead>
             <tr>
               <th style={{width: '20%'}}>Project</th>
@@ -161,10 +253,10 @@ function StatusTracker() {
           <tbody>
             {loading && data.length === 0 ? (
               <tr><td colSpan="6" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>Fetching tracker data...</td></tr>
-            ) : data.length === 0 ? (
+            ) : filteredData.length === 0 ? (
                <tr><td colSpan="6" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>No initiatives found.</td></tr>
             ) : (
-              data.map((row, idx) => (
+              filteredData.map((row, idx) => (
                 <tr key={idx}>
                   <td>
                     <div className="project-name">{row['Project Name'] || 'Unnamed Initiative'}</div>
