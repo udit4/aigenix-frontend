@@ -11,6 +11,7 @@ function StatusTracker() {
   const [selectedGeo, setSelectedGeo] = useState('All');
   const [selectedBU, setSelectedBU] = useState('All Projects');
   const [searchQuery, setSearchQuery] = useState('');
+  const [kpiFilter, setKpiFilter] = useState('All');
 
   // Apply theme class to body
   useEffect(() => {
@@ -58,7 +59,7 @@ function StatusTracker() {
 
   // Compute Metrics
   const totalInitiatives = data.length;
-  const activePOCs = data.filter(d => d.Status && d.Status.includes('Active POC')).length;
+  const activePOCs = data.filter(d => d['Paid Order'] && d['Paid Order'].includes('Active POC')).length;
   const paidOrders = data.filter(d => d['Paid Order'] === 'Yes' || d['Paid Order'] === 'Paid').length;
   
   // Compute unique Geos safely
@@ -85,6 +86,13 @@ function StatusTracker() {
     const matchGeo = selectedGeo === 'All' || (row.Geo && row.Geo.split(',').map(g => g.trim()).includes(selectedGeo));
     const matchBU = selectedBU === 'All Projects' || row['Business Unit'] === selectedBU;
     
+    let matchKpi = true;
+    if (kpiFilter === 'Active POC') {
+      matchKpi = row['Paid Order'] && row['Paid Order'].includes('Active POC');
+    } else if (kpiFilter === 'Paid Order') {
+      matchKpi = row['Paid Order'] === 'Yes' || row['Paid Order'] === 'Paid';
+    }
+    
     const query = searchQuery.toLowerCase();
     const matchQuery = !query || 
       (row['Project Name'] && row['Project Name'].toLowerCase().includes(query)) ||
@@ -92,7 +100,7 @@ function StatusTracker() {
       (row['Business Objective'] && row['Business Objective'].toLowerCase().includes(query)) ||
       (row['Working Team'] && row['Working Team'].toLowerCase().includes(query));
 
-    return matchGeo && matchBU && matchQuery;
+    return matchGeo && matchBU && matchKpi && matchQuery;
   });
 
   return (
@@ -145,19 +153,31 @@ function StatusTracker() {
 
       {/* KPI DASHBOARD */}
       <section className="kpi-grid">
-        <div className="kpi-card glass-panel" style={{borderTop: '3px solid var(--accent-blue)'}}>
+        <div 
+          className="kpi-card glass-panel" 
+          style={{borderTop: '3px solid var(--accent-blue)', cursor: 'pointer', opacity: kpiFilter === 'All' ? 1 : 0.5, transition: 'opacity 0.2s'}}
+          onClick={() => setKpiFilter('All')}
+        >
           <h3 className="kpi-title">Total Initiatives</h3>
           <div className="kpi-value glow-blue">{totalInitiatives}</div>
           <p className="kpi-subtitle">Across all business units</p>
         </div>
         
-        <div className="kpi-card glass-panel" style={{borderTop: '3px solid var(--accent-green)'}}>
+        <div 
+          className="kpi-card glass-panel" 
+          style={{borderTop: '3px solid var(--accent-green)', cursor: 'pointer', opacity: kpiFilter === 'Active POC' ? 1 : (kpiFilter === 'All' ? 1 : 0.5), transition: 'opacity 0.2s', boxShadow: kpiFilter === 'Active POC' ? '0 0 15px rgba(16, 185, 129, 0.2)' : 'none'}}
+          onClick={() => setKpiFilter(kpiFilter === 'Active POC' ? 'All' : 'Active POC')}
+        >
           <h3 className="kpi-title">Active POCs</h3>
           <div className="kpi-value glow-green">{activePOCs}</div>
           <p className="kpi-subtitle">Currently in execution</p>
         </div>
         
-        <div className="kpi-card glass-panel" style={{borderTop: '3px solid var(--accent-yellow)'}}>
+        <div 
+          className="kpi-card glass-panel" 
+          style={{borderTop: '3px solid var(--accent-yellow)', cursor: 'pointer', opacity: kpiFilter === 'Paid Order' ? 1 : (kpiFilter === 'All' ? 1 : 0.5), transition: 'opacity 0.2s', boxShadow: kpiFilter === 'Paid Order' ? '0 0 15px rgba(245, 158, 11, 0.2)' : 'none'}}
+          onClick={() => setKpiFilter(kpiFilter === 'Paid Order' ? 'All' : 'Paid Order')}
+        >
           <h3 className="kpi-title">Paid Orders</h3>
           <div className="kpi-value glow-yellow">{paidOrders}</div>
           <p className="kpi-subtitle">Revenue-generating projects</p>
@@ -319,7 +339,14 @@ function StatusTracker() {
                   </td>
                   <td>
                     {row['Paid Order'] ? (
-                      <span style={{color: 'var(--text-muted)'}}>{row['Paid Order']}</span>
+                      (row['Paid Order'].toLowerCase() === 'yes' || row['Paid Order'].toLowerCase() === 'paid') ? (
+                        <div className="status-pill green">
+                          <div className="status-dot green"></div>
+                          {row['Paid Order']}
+                        </div>
+                      ) : (
+                        <span style={{color: 'var(--text-muted)'}}>{row['Paid Order']}</span>
+                      )
                     ) : (
                       <span style={{color: 'var(--text-muted)'}}>-</span>
                     )}
