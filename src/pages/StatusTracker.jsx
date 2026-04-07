@@ -300,18 +300,29 @@ function StatusTracker() {
                   </td>
                   <td>
                     {row.Status ? (
-                      <div className={`status-pill ${row.Status.includes('POC') ? 'green' : 'yellow'}`}>
-                        <div className={`status-dot ${row.Status.includes('POC') ? 'green' : 'yellow'}`}></div>
-                        {row.Status}
-                      </div>
-                    ) : <span style={{color: 'var(--text-muted)'}}>-</span>}
+                      row.Status.toLowerCase().includes('progress') ? (
+                        <div className="status-pill yellow">
+                          <div className="status-dot yellow"></div>
+                          {row.Status}
+                        </div>
+                      ) : row.Status.toLowerCase().includes('completed') ? (
+                        <div className="status-pill green">
+                          <div className="status-dot green"></div>
+                          {row.Status}
+                        </div>
+                      ) : (
+                        <span style={{color: 'var(--text-muted)'}}>{row.Status}</span>
+                      )
+                    ) : (
+                      <span style={{color: 'var(--text-muted)'}}>-</span>
+                    )}
                   </td>
                   <td>
-                    {row['Paid Order'] === 'Yes' || row['Paid Order'] === 'Paid' ? (
-                      <span style={{color: 'var(--accent-green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px'}}>
-                        <CheckCircle2 size={16} /> Paid
-                      </span>
-                    ) : <span style={{color: 'var(--text-muted)'}}>-</span>}
+                    {row['Paid Order'] ? (
+                      <span style={{color: 'var(--text-muted)'}}>{row['Paid Order']}</span>
+                    ) : (
+                      <span style={{color: 'var(--text-muted)'}}>-</span>
+                    )}
                   </td>
                   <td>
                     {row.Geo ? (
