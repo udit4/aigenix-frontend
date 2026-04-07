@@ -209,7 +209,7 @@ function StatusTracker() {
           >
             All Projects
             <span style={{ 
-              background: selectedBU === 'All Projects' ? 'rgba(62, 139, 255, 0.15)' : 'rgba(255,255,255,0.08)', 
+              background: selectedBU === 'All Projects' ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
               color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
               padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
             }}>
@@ -229,7 +229,7 @@ function StatusTracker() {
             >
               {bu}
               <span style={{ 
-                background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : 'rgba(255,255,255,0.08)', 
+                background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
                 color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
                 padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
               }}>

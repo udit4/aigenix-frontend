@@ -5,7 +5,8 @@
   padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
+  height: 100vh;
 }
 
 /* Header Area */
@@ -63,8 +64,8 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 65vh;
-  margin-top: 16px;
+  flex: 1;
+  min-height: 0;
 }
 .data-table {
   width: 100%;
@@ -79,16 +80,24 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid var(--border-glass);
+  border-right: 1px solid var(--border-glass);
   position: sticky;
   top: 0;
   background: var(--bg-primary);
   z-index: 10;
 }
+.data-table th:last-child {
+  border-right: none;
+}
 .data-table td {
   padding: 20px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-glass);
+  border-right: 1px solid var(--border-glass);
   font-size: 14px;
   vertical-align: top;
+}
+.data-table td:last-child {
+  border-right: none;
 }
 .project-name {
   font-weight: 700;
