@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { RefreshCw, Zap, CheckCircle2, Sun, Moon } from 'lucide-react';
+import { RefreshCw, Zap, CheckCircle2, Sun, Moon, Search } from 'lucide-react';
 
 function StatusTracker() {
   const [data, setData] = useState([]);
@@ -10,6 +10,7 @@ function StatusTracker() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedGeo, setSelectedGeo] = useState('All');
   const [selectedBU, setSelectedBU] = useState('All Projects');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Apply theme class to body
   useEffect(() => {
@@ -83,7 +84,15 @@ function StatusTracker() {
   const filteredData = data.filter(row => {
     const matchGeo = selectedGeo === 'All' || (row.Geo && row.Geo.split(',').map(g => g.trim()).includes(selectedGeo));
     const matchBU = selectedBU === 'All Projects' || row['Business Unit'] === selectedBU;
-    return matchGeo && matchBU;
+    
+    const query = searchQuery.toLowerCase();
+    const matchQuery = !query || 
+      (row['Project Name'] && row['Project Name'].toLowerCase().includes(query)) ||
+      (row['Business Unit'] && row['Business Unit'].toLowerCase().includes(query)) ||
+      (row['Business Objective'] && row['Business Objective'].toLowerCase().includes(query)) ||
+      (row['Working Team'] && row['Working Team'].toLowerCase().includes(query));
+
+    return matchGeo && matchBU && matchQuery;
   });
 
   return (
@@ -196,65 +205,82 @@ function StatusTracker() {
       {/* DATA TABLE */}
       <section className="table-container glass-panel">
         
-        {/* BU TABS */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-glass)', padding: '0 8px', overflowX: 'auto' }}>
-          <div 
-            onClick={() => setSelectedBU('All Projects')}
-            style={{ 
-              padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
-              borderBottom: selectedBU === 'All Projects' ? '2px solid var(--accent-blue)' : '2px solid transparent',
-              color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
-              fontWeight: 600, fontSize: '14px', transition: 'all 0.2s', whiteSpace: 'nowrap'
-            }}
-          >
-            All Projects
-            <span style={{ 
-              background: selectedBU === 'All Projects' ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
-              color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
-              padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
-            }}>
-              {buCounts['All Projects']}
-            </span>
-          </div>
-          {uniqueBUs.map(bu => (
+        {/* BU TABS & SEARCH */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)', padding: '0 8px', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', overflowX: 'auto', flex: 1 }}>
             <div 
-              key={bu}
-              onClick={() => setSelectedBU(bu)}
+              onClick={() => setSelectedBU('All Projects')}
               style={{ 
                 padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
-                borderBottom: selectedBU === bu ? '2px solid var(--accent-blue)' : '2px solid transparent',
-                color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
+                borderBottom: selectedBU === 'All Projects' ? '2px solid var(--accent-blue)' : '2px solid transparent',
+                color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
                 fontWeight: 600, fontSize: '14px', transition: 'all 0.2s', whiteSpace: 'nowrap'
               }}
             >
-              {bu}
+              All Projects
               <span style={{ 
-                background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
-                color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
+                background: selectedBU === 'All Projects' ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
+                color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
                 padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
               }}>
-                {buCounts[bu]}
+                {buCounts['All Projects']}
               </span>
             </div>
-          ))}
+            {uniqueBUs.map(bu => (
+              <div 
+                key={bu}
+                onClick={() => setSelectedBU(bu)}
+                style={{ 
+                  padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
+                  borderBottom: selectedBU === bu ? '2px solid var(--accent-blue)' : '2px solid transparent',
+                  color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
+                  fontWeight: 600, fontSize: '14px', transition: 'all 0.2s', whiteSpace: 'nowrap'
+                }}
+              >
+                {bu}
+                <span style={{ 
+                  background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
+                  color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
+                  padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
+                }}>
+                  {buCounts[bu]}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          <div style={{ padding: '0 16px', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.05)', border: '1px solid var(--accent-blue)', borderRadius: '12px', minWidth: '300px', margin: '8px 12px 8px 0' }}>
+            <Search size={16} color="var(--text-muted)" />
+            <div style={{ height: '20px', width: '1px', background: 'var(--border-glass)', margin: '0 12px' }}></div>
+            <input 
+              type="text" 
+              placeholder="Search projects..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                border: 'none', background: 'transparent', color: 'var(--text-primary)', padding: '12px 0', width: '100%', outline: 'none', fontSize: '14px'
+              }}
+            />
+          </div>
         </div>
 
         <table className="data-table" style={{ marginTop: '0' }}>
           <thead>
             <tr>
-              <th style={{width: '20%'}}>Project</th>
-              <th style={{width: '30%'}}>Business Objective</th>
+              <th style={{width: '18%'}}>Project</th>
+              <th style={{width: '22%'}}>Business Objective</th>
+              <th style={{width: '16%'}}>Client Engagements</th>
               <th style={{width: '12%'}}>Status</th>
-              <th style={{width: '8%'}}>Paid</th>
+              <th style={{width: '6%'}}>Paid</th>
               <th style={{width: '10%'}}>Geo</th>
-              <th style={{width: '20%'}}>Team</th>
+              <th style={{width: '16%'}}>Team</th>
             </tr>
           </thead>
           <tbody>
             {loading && data.length === 0 ? (
-              <tr><td colSpan="6" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>Fetching tracker data...</td></tr>
+              <tr><td colSpan="7" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>Fetching tracker data...</td></tr>
             ) : filteredData.length === 0 ? (
-               <tr><td colSpan="6" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>No initiatives found.</td></tr>
+               <tr><td colSpan="7" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>No initiatives found.</td></tr>
             ) : (
               filteredData.map((row, idx) => (
                 <tr key={idx}>
@@ -265,6 +291,11 @@ function StatusTracker() {
                   <td>
                     <div className="business-obj">
                       {row['Business Objective'] || '-'}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="business-obj" style={{fontSize: '13px'}}>
+                      {row['Client Engagments'] || row['Client Engagements'] || '-'}
                     </div>
                   </td>
                   <td>

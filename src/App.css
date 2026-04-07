@@ -2,10 +2,10 @@
 .app-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   height: 100vh;
 }
 
@@ -37,10 +37,10 @@
   gap: 20px;
 }
 .kpi-card {
-  padding: 24px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
 .kpi-title {
   color: var(--text-muted);
@@ -50,12 +50,12 @@
   letter-spacing: 0.5px;
 }
 .kpi-value {
-  font-size: 48px;
+  font-size: 36px;
   font-weight: 900;
   line-height: 1;
 }
 .kpi-subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
