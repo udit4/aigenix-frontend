@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Users, Layers, Settings, HelpCircle, Bell, History, 
   ChevronLeft, ChevronRight, Lock, Copy, CheckCircle2, 
-  PieChart, Search, ArrowUpRight, ArrowDownRight, User, Database, Package, Sparkles
+  PieChart, Search, ArrowUpRight, ArrowDownRight, User, Database, Package, Sparkles, ChevronDown
 } from 'lucide-react';
 import './CustomerIntelligence.css';
 
@@ -57,6 +57,10 @@ const mockCustomers = Array.from({ length: 20 }, (_, i) => {
 function CustomerIntelligence() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [selectedLlm, setSelectedLlm] = useState("Llama 3.2 8B");
+  const [isLlmDropdownOpen, setIsLlmDropdownOpen] = useState(false);
+  
+  const llmOptions = ["Llama 3.2 8B", "Llama 3.2 3B", "Qwen 2.5 7B", "Mistral NeMo", "On-Premise Default"];
   
   const customer = mockCustomers[currentIndex];
 
@@ -100,16 +104,53 @@ function CustomerIntelligence() {
         
         <nav className="ci-nav">
           <div className="ci-nav-item active"><Users size={18} /> Customers</div>
-          <div className="ci-nav-item"><Layers size={18} /> Cohort Builder</div>
+          
+          <div className="ci-custom-dropdown-container">
+            <div style={{fontSize: '11px', color: '#8A94A6', marginBottom: '8px', paddingLeft: '4px', fontWeight: 600, letterSpacing: '0.5px'}}>
+              <Lock size={12} style={{display:'inline', verticalAlign:'-2px', marginRight:'4px'}}/> ACTIVE MODEL
+            </div>
+            <div 
+              className="ci-custom-dropdown-value"
+              onClick={() => setIsLlmDropdownOpen(!isLlmDropdownOpen)}
+            >
+              {selectedLlm}
+              <ChevronDown size={14} style={{transform: isLlmDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}} />
+            </div>
+            
+            {isLlmDropdownOpen && (
+              <div className="ci-custom-dropdown-menu">
+                {llmOptions.map(llm => (
+                  <div 
+                    key={llm} 
+                    className={`ci-custom-dropdown-option ${selectedLlm === llm ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedLlm(llm);
+                      setIsLlmDropdownOpen(false);
+                    }}
+                  >
+                    {llm}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
         
         <div className="ci-sidebar-bottom">
-          <div className="ci-llm-badge">
-            <Lock size={14} /> On-Premise LLM Active
-          </div>
-          <div style={{display:'flex', flexDirection:'column', gap:'12px', marginTop:'24px'}}>
+          <div style={{display:'flex', flexDirection:'column', gap:'12px', marginBottom: '32px'}}>
             <div className="ci-nav-item" style={{padding: '8px 4px'}}><Settings size={18} /> Settings</div>
             <div className="ci-nav-item" style={{padding: '8px 4px'}}><HelpCircle size={18} /> Support</div>
+          </div>
+
+          <div className="ci-sidebar-data">
+            <div className="ci-sidebar-data-title">
+              <Database size={12} /> DATA SOURCES ACTIVE
+            </div>
+            <div className="ci-sidebar-data-list">
+              <div className="ci-sidebar-data-tag"><div className="ci-pulse"></div> Transaction Data</div>
+              <div className="ci-sidebar-data-tag"><div className="ci-pulse"></div> Product Catalog</div>
+              <div className="ci-sidebar-data-tag"><div className="ci-pulse"></div> LLM Engine</div>
+            </div>
           </div>
         </div>
       </aside>
@@ -120,8 +161,6 @@ function CustomerIntelligence() {
         <header className="ci-topbar">
           <div className="ci-tabs">
             <div className="ci-tab active">Portfolio</div>
-            <div className="ci-tab">Analytics</div>
-            <div className="ci-tab">Reports</div>
           </div>
           
           <div className="ci-user-area">
@@ -191,12 +230,12 @@ function CustomerIntelligence() {
 
               {/* Spend Distribution */}
               <div className="ci-spend-section">
-                <div>
+                <div style={{width: '100%'}}>
                   <div className="ci-section-title"><PieChart size={14} /> SPEND DISTRIBUTION ANALYSIS</div>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '40px', marginTop: '24px'}}>
+                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '64px', marginTop: '32px', paddingRight: '24px'}}>
                     
                     {/* SVG Donut implementation matching the image */}
-                    <div className="ci-donut">
+                    <div className="ci-donut" style={{flexShrink: 0}}>
                       <svg viewBox="0 0 100 100" width="140" height="140" style={{transform: 'rotate(-90deg)', position: 'absolute'}}>
                         {/* Base Circle / Light Blue / Utilities */}
                         <circle cx="50" cy="50" r="40" fill="transparent" stroke="#BAE6FD" strokeWidth="20" />
@@ -310,19 +349,6 @@ function CustomerIntelligence() {
           </div>
           
         </div>
-
-        {/* Footer Active Trackers */}
-        <div className="ci-footer-bar">
-          <div className="ci-footer-title">
-            <Database size={14} /> DATA SOURCES ACTIVE
-          </div>
-          <div className="ci-footer-tags">
-            <div className="ci-footer-tag"><div className="ci-pulse"></div> Transaction Data</div>
-            <div className="ci-footer-tag"><div className="ci-pulse"></div> Product Catalog</div>
-            <div className="ci-footer-tag"><div className="ci-pulse"></div> LLM Engine</div>
-          </div>
-        </div>
-
       </main>
     </div>
   );
