@@ -1,0 +1,229 @@
+.rg-layout {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.rg-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.rg-page-header {
+  margin-bottom: 32px;
+}
+
+.rg-page-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.rg-page-header p {
+  color: #64748b;
+  font-size: 15px;
+}
+
+.rg-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.rg-upload-section {
+  margin-bottom: 28px;
+}
+
+.rg-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.rg-label span {
+  background: #2563eb;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.rg-file-input-wrapper {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  transition: all 0.2s;
+  background: #fafafa;
+}
+
+.rg-file-input-wrapper:hover {
+  border-color: #2563eb;
+  background: #f0f7ff;
+}
+
+.rg-file-input-wrapper.has-file {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.rg-file-input-wrapper input {
+  display: none;
+}
+
+.rg-file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.rg-file-name {
+  color: #0f172a;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.rg-pdf-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.rg-pdf-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.rg-pdf-tag button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0 4px;
+}
+
+.rg-pdf-tag button:hover {
+  color: #ef4444;
+}
+
+.rg-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.rg-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rg-threshold-section {
+  margin-bottom: 28px;
+}
+
+.rg-slider {
+  width: 100%;
+  margin: 12px 0;
+  accent-color: #2563eb;
+}
+
+.rg-threshold-hint {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.rg-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.rg-submit-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rg-submit-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.rg-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rg-info-box {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  border: 1px solid #e2e8f0;
+}
+
+.rg-info-box h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.rg-info-box ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.rg-info-box li {
+  margin-bottom: 6px;
+}
