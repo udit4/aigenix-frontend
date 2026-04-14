@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { FileSpreadsheet, FileText, Download, Loader2, UploadCloud, AlertCircle, Settings } from 'lucide-react';
+import { FileSpreadsheet, FileText, Download, Loader2, UploadCloud, AlertCircle, Settings, FileDown } from 'lucide-react';
 import './ReportGenerator.css';
 
 function ReportGenerator() {
@@ -55,11 +55,19 @@ function ReportGenerator() {
     setPdfFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Helper to trigger download from base64
   const downloadBase64File = (base64Data, filename) => {
     const link = document.createElement('a');
     link.href = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${base64Data}`;
     link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadSampleExcel = () => {
+    const link = document.createElement('a');
+    link.href = '/sample_excel.xlsx';
+    link.download = 'sample_excel.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -111,6 +119,14 @@ function ReportGenerator() {
         <div className="rg-page-header">
           <h1>Excel‑PDF Report Generator</h1>
           <p>Upload your Excel master and BCTPL/TNMAS PDFs to generate matched reports.</p>
+          <button
+            type="button"
+            className="rg-sample-btn"
+            onClick={downloadSampleExcel}
+          >
+            <FileDown size={16} />
+            Download Sample Excel
+          </button>
         </div>
 
         <div className="rg-card">
