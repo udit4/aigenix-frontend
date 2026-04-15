@@ -61,7 +61,7 @@ function CustomerIntelligence() {
       setLoading(true);
       try {
         const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
-        const response = await fetch(`${baseUrl}/customers/`);
+        const response = await fetch(`${baseUrl}/customers`);
         if (!response.ok) {
           throw new Error('Failed to fetch customers');
         }
