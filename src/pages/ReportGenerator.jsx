@@ -96,7 +96,7 @@ function ReportGenerator() {
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/report/generate', formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/report/generate`, formData);
       const { matched, unmatched } = response.data;
 
       if (matched && matched.data) {
