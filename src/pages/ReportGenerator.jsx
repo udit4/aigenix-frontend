@@ -66,8 +66,8 @@ function ReportGenerator() {
 
   const downloadSampleExcel = () => {
     const link = document.createElement('a');
-    link.href = '/sample_excel.xlsx';
-    link.download = 'sample_excel.xlsx';
+    link.href = '/sample_excel_final.xlsx';
+    link.download = 'sample_excel_final.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
