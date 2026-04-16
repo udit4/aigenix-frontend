@@ -267,10 +267,10 @@ function CustomerIntelligence() {
         </header>
 
         {activeSidebarTab === "Playground" ? (
-          <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+          <div style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
             <div className="ci-page-header">
               <div className="ci-page-title">
-                <h1>LLM Match Playground</h1>
+                <h1>Playground</h1>
                 <p>Simulate customer attributes and test realtime semantic matching.</p>
               </div>
               <div className="ci-paginator">
@@ -468,7 +468,7 @@ function CustomerIntelligence() {
             )}
           </div>
         ) : (
-          <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+          <div style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
             {/* Page Header */}
             <div className="ci-page-header">
               <div className="ci-page-title">
