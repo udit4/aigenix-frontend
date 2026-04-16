@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ mode }) => {
   const envVar = process.env.ENV;
-  const targetMode = (!envVar || envVar === 'staging') ? 'production' : (envVar === 'development' ? 'development' : mode);
+  const targetMode = (envVar === 'production' || envVar === 'staging') ? envVar : 'development';
   
   const env = loadEnv(targetMode, process.cwd(), 'VITE_');
   
