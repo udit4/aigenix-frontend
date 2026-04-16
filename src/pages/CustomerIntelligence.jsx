@@ -48,42 +48,42 @@ const mockCustomers = Array.from({ length: 20 }, (_, i) => {
 
 function CustomerIntelligence() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [customer, setCustomer] = useState(null);
   const [copied, setCopied] = useState(false);
   const [selectedLlm, setSelectedLlm] = useState("Llama 3.2 8B");
   const [isLlmDropdownOpen, setIsLlmDropdownOpen] = useState(false);
-  const [customersData, setCustomersData] = useState(mockCustomers);
   const [loading, setLoading] = useState(true);
 
   const llmOptions = ["Llama 3.2 8B", "Llama 3.2 3B", "Qwen 2.5 7B", "Mistral NeMo", "On-Premise Default"];
 
+  const totalCustomers = 20;
+  const customerId = `CUST${String(currentIndex + 1).padStart(3, '0')}`;
+
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const fetchCustomer = async () => {
       setLoading(true);
       try {
         const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
-        const response = await fetch(`${baseUrl}/customers`);
+        const response = await fetch(`${baseUrl}/customers/${customerId}/profile`);
         if (!response.ok) {
-          throw new Error('Failed to fetch customers');
+          throw new Error('Failed to fetch customer profile');
         }
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setCustomersData(data);
-        } else if (data && Array.isArray(data.data) && data.data.length > 0) {
-          setCustomersData(data.data);
-        }
+        setCustomer(data);
       } catch (err) {
-        console.error("Error fetching customers:", err);
+        console.error("Error fetching customer:", err);
+        // Setting fallback data in case API fails
+        const fallback = mockCustomers[currentIndex] || mockCustomers[0];
+        setCustomer({ ...fallback, customer_id: customerId });
       } finally {
         setLoading(false);
       }
     };
-    fetchCustomers();
-  }, []);
-
-  const customer = customersData[currentIndex] || mockCustomers[0];
+    fetchCustomer();
+  }, [currentIndex, customerId]);
 
   const handleNext = () => {
-    if (currentIndex < customersData.length - 1) setCurrentIndex(prev => prev + 1);
+    if (currentIndex < totalCustomers - 1) setCurrentIndex(prev => prev + 1);
     setCopied(false);
   };
 
@@ -226,8 +226,8 @@ function CustomerIntelligence() {
             <button onClick={handlePrev} disabled={currentIndex === 0 || loading} style={{ opacity: (currentIndex === 0 || loading) ? 0.3 : 1 }}>
               <ChevronLeft size={16} />
             </button>
-            <span>Customer <span style={{ color: '#0f172a' }}>{currentIndex + 1}</span> of {customersData.length}</span>
-            <button onClick={handleNext} disabled={currentIndex === customersData.length - 1} style={{ opacity: currentIndex === customersData.length - 1 ? 0.3 : 1 }}>
+            <span>Customer <span style={{ color: '#0f172a' }}>{currentIndex + 1}</span> of {totalCustomers}</span>
+            <button onClick={handleNext} disabled={currentIndex === totalCustomers - 1} style={{ opacity: currentIndex === totalCustomers - 1 ? 0.3 : 1 }}>
               <ChevronRight size={16} />
             </button>
           </div>
