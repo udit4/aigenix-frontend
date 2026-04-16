@@ -94,7 +94,7 @@ function CustomerIntelligence() {
 
   const copyHook = () => {
     if (customer) {
-      navigator.clipboard.writeText(customer.aiMatch?.hook || "Get more from every purchase with a card designed around your spending habits.");
+      navigator.clipboard.writeText(customer.product_match?.campaign_notification || customer.aiMatch?.hook || "Get more from every purchase with a card designed around your spending habits.");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -340,17 +340,17 @@ function CustomerIntelligence() {
                     <div className="ci-ai-match-tag">TOP AI MATCH</div>
                   </div>
 
-                  <div className="ci-product-title">{customer.aiMatch?.productName || "Product Recommendation"}</div>
+                  <div className="ci-product-title">{customer.product_match?.matched_product_name || customer.aiMatch?.productName || "Product Recommendation"}</div>
                   <div className="ci-product-subtitle">{customer.aiMatch?.tier || "Personalized Selection"}</div>
 
                   <div className="ci-section-title">AI RATIONALE</div>
                   <div className="ci-rationale">
-                    <p>"{customer.aiMatch?.rationale || "AI analysis indicates a strong alignment with premium rewards structures."}"</p>
+                    <p>"{customer.product_match?.why_this_match || customer.aiMatch?.rationale || "AI analysis indicates a strong alignment with premium rewards structures."}"</p>
                   </div>
 
                   <div className="ci-section-title">SUGGESTED CAMPAIGN HOOK</div>
                   <div className="ci-hook-box">
-                    <p>{customer.aiMatch?.hook || "Get more from every purchase with a card designed around your spending habits."}</p>
+                    <p>{customer.product_match?.campaign_notification || customer.aiMatch?.hook || "Get more from every purchase with a card designed around your spending habits."}</p>
                   </div>
 
                   <div className="ci-match-actions">
