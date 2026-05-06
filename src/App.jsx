@@ -3,6 +3,7 @@ import StatusTracker from './pages/StatusTracker';
 import CustomerIntelligence from './pages/CustomerIntelligence';
 import ReportGenerator from './pages/ReportGenerator';
 import AttendanceExtractor from './pages/AttendanceExtractor';
+import RojgarJobseeker from './pages/RojgarJobseeker';
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <Route path="/customer-intelligence" element={<CustomerIntelligence />} />
       <Route path="/report-generator" element={<ReportGenerator />} />
       <Route path="/attendance" element={<AttendanceExtractor />} />
+      <Route path="/rojgar-jobseeker" element={<RojgarJobseeker />} />
     </Routes>
   );
 }
