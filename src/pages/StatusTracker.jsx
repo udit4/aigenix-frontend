@@ -111,7 +111,7 @@ function StatusTracker() {
           <div className="loader-box glass-panel">
             <RefreshCw size={36} className="spin" color="var(--accent-blue)" />
             <h3 style={{marginTop: '20px', fontSize: '18px'}}>Syncing Database...</h3>
-            <p style={{color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px'}}>Fetching latest AIGenix initiatives</p>
+            <p style={{color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px'}}>Fetching latest initiatives...</p>
           </div>
         </div>
       )}
@@ -123,7 +123,7 @@ function StatusTracker() {
             <Zap size={24} color="var(--accent-blue)" />
           </div>
           <h1 style={{ fontWeight: 800, fontSize: '24px', letterSpacing: '-0.5px' }}>
-            AIGeniX <span style={{fontWeight: 400, color: 'var(--text-muted)'}}>Initiative Tracker</span>
+            Digital Engineering, Data & AI <span style={{fontWeight: 400, color: 'var(--text-muted)'}}>Key Updates</span>
           </h1>
         </div>
         <div className="header-actions">
