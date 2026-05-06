@@ -49,7 +49,10 @@ const RojgarJobseeker = () => {
     }
   };
 
-  const handleFileUpload = () => {
+  const handleFileUpload = (e) => {
+    if (e && e.target && e.target.files) {
+      if (e.target.files.length === 0) return; // user cancelled file selection
+    }
     setUploadStatus('uploading');
     setTimeout(() => {
       setUploadStatus('done');
@@ -73,7 +76,7 @@ const RojgarJobseeker = () => {
       {/* Top Navbar */}
       <nav className="rj-navbar">
         <div className="rj-logo">
-          <div className="rj-logo-icon">RP</div>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Seal_of_Uttarakhand.svg/250px-Seal_of_Uttarakhand.svg.png" alt="Uttarakhand Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
           <div className="rj-logo-text">
             <h2>Rojgar Prayag 2.0</h2>
             <p>Unified Portal for Skilling — Govt of Uttarakhand</p>
@@ -160,17 +163,24 @@ const RojgarJobseeker = () => {
           <div className="rj-upload-container">
             <div className="rj-upload-header">
               <h1>Build Your Profile</h1>
-              <p style={{ color: 'var(--text-muted)' }}>Upload your resume and let our AI do the heavy lifting.</p>
+              {uploadStatus === 'done' ? (
+                <p style={{ color: 'var(--accent-green)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={16} /> Data successfully parsed from your resume
+                </p>
+              ) : (
+                <p style={{ color: 'var(--text-muted)' }}>Upload your resume and let our AI do the heavy lifting.</p>
+              )}
             </div>
 
             {uploadStatus === 'idle' && (
-              <div className="rj-dropzone glass-panel" onClick={handleFileUpload}>
+              <label className="rj-dropzone glass-panel" style={{ display: 'flex', cursor: 'pointer' }}>
+                <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleFileUpload} />
                 <div className="rj-dropzone-icon">
                   <UploadCloud size={32} />
                 </div>
                 <h3>Upload your Resume (PDF)</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Click or drag and drop your PDF here</p>
-              </div>
+              </label>
             )}
 
             {uploadStatus === 'uploading' && (
@@ -245,6 +255,13 @@ const RojgarJobseeker = () => {
                   <div className="rj-score-label">Good — Improve keywords for better visibility</div>
                   
                   <div className="rj-suggestions">
+                    <div style={{ fontSize: '13px', fontWeight: 600, margin: '16px 0 8px 0', color: 'var(--accent-blue)' }}>Missing Keywords (Add to resume)</div>
+                    <div className="rj-skill-tags" style={{ marginBottom: '16px' }}>
+                      <span className="rj-skill-tag" style={{ borderStyle: 'dashed', cursor: 'pointer', background: 'white' }}>+ Data Visualization</span>
+                      <span className="rj-skill-tag" style={{ borderStyle: 'dashed', cursor: 'pointer', background: 'white' }}>+ Pandas</span>
+                      <span className="rj-skill-tag" style={{ borderStyle: 'dashed', cursor: 'pointer', background: 'white' }}>+ A/B Testing</span>
+                    </div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, margin: '16px 0 8px 0', color: 'var(--accent-blue)' }}>Other Recommendations</div>
                     <div className="rj-suggestion-item"><CheckCircle2 size={14} color="var(--text-muted)" /> Add certifications</div>
                     <div className="rj-suggestion-item"><CheckCircle2 size={14} color="var(--text-muted)" /> Quantify achievements</div>
                     <div className="rj-suggestion-item"><CheckCircle2 size={14} color="var(--text-muted)" /> Add a LinkedIn URL</div>
@@ -358,6 +375,7 @@ const RojgarJobseeker = () => {
                   <div className="rj-job-details">
                     <div className="rj-job-detail-item"><MapPin size={14} /> Dehradun</div>
                     <div className="rj-job-detail-item">₹4.2–5.8 LPA</div>
+                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: Naukri.com</div>
                   </div>
                   <div className="rj-job-actions">
                     <button className="rj-apply-btn" onClick={() => showToast('Application submitted to NIC Dehradun!')}>Apply Now</button>
@@ -376,6 +394,7 @@ const RojgarJobseeker = () => {
                   <div className="rj-job-details">
                     <div className="rj-job-detail-item"><MapPin size={14} /> Dehradun</div>
                     <div className="rj-job-detail-item">₹3.8–4.5 LPA</div>
+                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: Naukri.com</div>
                   </div>
                   <div className="rj-job-actions">
                     <button className="rj-apply-btn" onClick={() => showToast('Application submitted to Uttarakhand Power Corp!')}>Apply Now</button>
@@ -394,6 +413,7 @@ const RojgarJobseeker = () => {
                   <div className="rj-job-details">
                     <div className="rj-job-detail-item"><MapPin size={14} /> Dehradun</div>
                     <div className="rj-job-detail-item">₹3.5–5 LPA</div>
+                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: LinkedIn</div>
                   </div>
                   <div className="rj-job-actions">
                     <button className="rj-apply-btn" onClick={() => showToast('Application submitted to TCS Dehradun!')}>Apply Now</button>
@@ -412,6 +432,7 @@ const RojgarJobseeker = () => {
                   <div className="rj-job-details">
                     <div className="rj-job-detail-item"><MapPin size={14} /> Haridwar</div>
                     <div className="rj-job-detail-item">₹2.5–3.5 LPA</div>
+                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: Naukri.com</div>
                   </div>
                   <div className="rj-job-actions">
                     <button className="rj-apply-btn" onClick={() => showToast('Application submitted to Infosys Haridwar!')}>Apply Now</button>
@@ -419,6 +440,17 @@ const RojgarJobseeker = () => {
                 </div>
 
               </div>
+              
+              {/* Pagination */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px' }}>
+                <button className="rj-course-btn" disabled style={{ opacity: 0.5 }}>&lt; Prev</button>
+                <button className="rj-course-btn" style={{ background: 'var(--accent-orange)', color: 'white' }}>1</button>
+                <button className="rj-course-btn">2</button>
+                <button className="rj-course-btn">3</button>
+                <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>...</span>
+                <button className="rj-course-btn">Next &gt;</button>
+              </div>
+
             </div>
           </div>
         )}
