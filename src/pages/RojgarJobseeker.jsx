@@ -12,6 +12,7 @@ const RojgarJobseeker = () => {
   const [formData, setFormData] = useState({ name: '', aadhaar: '', otp: '' });
   const [uploadStatus, setUploadStatus] = useState('idle'); // 'idle', 'uploading', 'done'
   const [toastMessage, setToastMessage] = useState('');
+  const [currentJobPage, setCurrentJobPage] = useState(1);
 
   // Hardcoded User Data
   const mockProfile = {
@@ -70,6 +71,23 @@ const RojgarJobseeker = () => {
     setFormData({ name: '', aadhaar: '', otp: '' });
     setUploadStatus('idle');
   };
+
+  const mockJobs = [
+    { id: 1, title: 'Data Analyst', company: 'NIC Dehradun', type: 'Govt', match: 87, location: 'Dehradun', salary: '₹4.2–5.8 LPA', source: 'Naukri.com' },
+    { id: 2, title: 'MIS Executive', company: 'Uttarakhand Power Corp', type: 'Govt', match: 81, location: 'Dehradun', salary: '₹3.8–4.5 LPA', source: 'Naukri.com' },
+    { id: 3, title: 'Junior Data Analyst', company: 'TCS Dehradun', type: 'Private', match: 76, location: 'Dehradun', salary: '₹3.5–5 LPA', source: 'LinkedIn' },
+    { id: 4, title: 'Business Analyst Intern', company: 'Infosys Haridwar', type: 'Private', match: 68, location: 'Haridwar', salary: '₹2.5–3.5 LPA', source: 'Naukri.com' },
+    { id: 5, title: 'Data Scientist', company: 'Wipro Dehradun', type: 'Private', match: 65, location: 'Dehradun', salary: '₹6.0–8.0 LPA', source: 'LinkedIn' },
+    { id: 6, title: 'Research Analyst', company: 'Forest Research Institute', type: 'Govt', match: 62, location: 'Dehradun', salary: '₹4.0–5.5 LPA', source: 'Naukri.com' },
+    { id: 7, title: 'Python Developer', company: 'TechNova', type: 'Private', match: 58, location: 'Roorkee', salary: '₹4.5–6.0 LPA', source: 'Indeed' },
+    { id: 8, title: 'Data Entry Operator', company: 'State Health Dept', type: 'Govt', match: 55, location: 'Haldwani', salary: '₹2.0–3.0 LPA', source: 'Naukri.com' },
+    { id: 9, title: 'BI Analyst', company: 'Cognizant', type: 'Private', match: 52, location: 'Dehradun', salary: '₹5.0–7.0 LPA', source: 'LinkedIn' },
+    { id: 10, title: 'Operations Analyst', company: 'ONGC Dehradun', type: 'Govt', match: 50, location: 'Dehradun', salary: '₹5.5–7.5 LPA', source: 'Naukri.com' }
+  ];
+
+  const jobsPerPage = 4;
+  const totalPages = Math.ceil(mockJobs.length / jobsPerPage);
+  const displayedJobs = mockJobs.slice((currentJobPage - 1) * jobsPerPage, currentJobPage * jobsPerPage);
 
   return (
     <div className="rj-layout">
@@ -362,93 +380,53 @@ const RojgarJobseeker = () => {
               <h3 className="rj-card-title"><Briefcase size={18} className="glow-yellow" /> Recommended Jobs for You</h3>
               
               <div className="rj-jobs-grid">
-                
-                {/* Job 1 */}
-                <div className="rj-job-card">
-                  <div className="rj-job-header">
-                    <div>
-                      <div className="rj-job-title">Data Analyst</div>
-                      <div className="rj-job-company"><Building2 size={12} /> NIC Dehradun <span className="rj-badge rj-badge-gov">Govt</span></div>
+                {displayedJobs.map((job) => (
+                  <div key={job.id} className="rj-job-card">
+                    <div className="rj-job-header">
+                      <div>
+                        <div className="rj-job-title">{job.title}</div>
+                        <div className="rj-job-company"><Building2 size={12} /> {job.company} <span className={`rj-badge ${job.type === 'Govt' ? 'rj-badge-gov' : 'rj-badge-pvt'}`}>{job.type}</span></div>
+                      </div>
+                      <div className={`rj-job-match ${job.match >= 80 ? 'high' : job.match >= 70 ? 'medium' : 'low'}`}><Sparkles size={12} /> {job.match}% Match</div>
                     </div>
-                    <div className="rj-job-match high"><Sparkles size={12} /> 87% Match</div>
-                  </div>
-                  <div className="rj-job-details">
-                    <div className="rj-job-detail-item"><MapPin size={14} /> Dehradun</div>
-                    <div className="rj-job-detail-item">₹4.2–5.8 LPA</div>
-                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: Naukri.com</div>
-                  </div>
-                  <div className="rj-job-actions">
-                    <button className="rj-apply-btn" onClick={() => showToast('Application submitted to NIC Dehradun!')}>Apply Now</button>
-                  </div>
-                </div>
-
-                {/* Job 2 */}
-                <div className="rj-job-card">
-                  <div className="rj-job-header">
-                    <div>
-                      <div className="rj-job-title">MIS Executive</div>
-                      <div className="rj-job-company"><Building2 size={12} /> Uttarakhand Power Corp <span className="rj-badge rj-badge-gov">Govt</span></div>
+                    <div className="rj-job-details">
+                      <div className="rj-job-detail-item"><MapPin size={14} /> {job.location}</div>
+                      <div className="rj-job-detail-item">{job.salary}</div>
+                      <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: {job.source}</div>
                     </div>
-                    <div className="rj-job-match high"><Sparkles size={12} /> 81% Match</div>
-                  </div>
-                  <div className="rj-job-details">
-                    <div className="rj-job-detail-item"><MapPin size={14} /> Dehradun</div>
-                    <div className="rj-job-detail-item">₹3.8–4.5 LPA</div>
-                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: Naukri.com</div>
-                  </div>
-                  <div className="rj-job-actions">
-                    <button className="rj-apply-btn" onClick={() => showToast('Application submitted to Uttarakhand Power Corp!')}>Apply Now</button>
-                  </div>
-                </div>
-
-                {/* Job 3 */}
-                <div className="rj-job-card">
-                  <div className="rj-job-header">
-                    <div>
-                      <div className="rj-job-title">Junior Data Analyst</div>
-                      <div className="rj-job-company"><Building2 size={12} /> TCS Dehradun <span className="rj-badge rj-badge-pvt">Private</span></div>
+                    <div className="rj-job-actions">
+                      <button className="rj-apply-btn" onClick={() => showToast(`Application submitted to ${job.company}!`)}>Apply Now</button>
                     </div>
-                    <div className="rj-job-match medium"><Sparkles size={12} /> 76% Match</div>
                   </div>
-                  <div className="rj-job-details">
-                    <div className="rj-job-detail-item"><MapPin size={14} /> Dehradun</div>
-                    <div className="rj-job-detail-item">₹3.5–5 LPA</div>
-                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: LinkedIn</div>
-                  </div>
-                  <div className="rj-job-actions">
-                    <button className="rj-apply-btn" onClick={() => showToast('Application submitted to TCS Dehradun!')}>Apply Now</button>
-                  </div>
-                </div>
-
-                {/* Job 4 */}
-                <div className="rj-job-card">
-                  <div className="rj-job-header">
-                    <div>
-                      <div className="rj-job-title">Business Analyst Intern</div>
-                      <div className="rj-job-company"><Building2 size={12} /> Infosys Haridwar <span className="rj-badge rj-badge-pvt">Private</span></div>
-                    </div>
-                    <div className="rj-job-match low"><Sparkles size={12} /> 68% Match</div>
-                  </div>
-                  <div className="rj-job-details">
-                    <div className="rj-job-detail-item"><MapPin size={14} /> Haridwar</div>
-                    <div className="rj-job-detail-item">₹2.5–3.5 LPA</div>
-                    <div className="rj-job-detail-item" style={{ color: 'var(--accent-orange)' }}>Source: Naukri.com</div>
-                  </div>
-                  <div className="rj-job-actions">
-                    <button className="rj-apply-btn" onClick={() => showToast('Application submitted to Infosys Haridwar!')}>Apply Now</button>
-                  </div>
-                </div>
-
+                ))}
               </div>
               
               {/* Pagination */}
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px' }}>
-                <button className="rj-course-btn" disabled style={{ opacity: 0.5 }}>&lt; Prev</button>
-                <button className="rj-course-btn" style={{ background: 'var(--accent-orange)', color: 'white' }}>1</button>
-                <button className="rj-course-btn">2</button>
-                <button className="rj-course-btn">3</button>
-                <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>...</span>
-                <button className="rj-course-btn">Next &gt;</button>
+                <button 
+                  className="rj-course-btn" 
+                  disabled={currentJobPage === 1} 
+                  style={{ opacity: currentJobPage === 1 ? 0.5 : 1 }}
+                  onClick={() => setCurrentJobPage(prev => Math.max(1, prev - 1))}
+                >&lt; Prev</button>
+                
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button 
+                    key={idx + 1}
+                    className="rj-course-btn" 
+                    style={{ background: currentJobPage === idx + 1 ? 'var(--accent-orange)' : 'transparent', color: currentJobPage === idx + 1 ? 'white' : 'var(--accent-orange)' }}
+                    onClick={() => setCurrentJobPage(idx + 1)}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+
+                <button 
+                  className="rj-course-btn" 
+                  disabled={currentJobPage === totalPages}
+                  style={{ opacity: currentJobPage === totalPages ? 0.5 : 1 }}
+                  onClick={() => setCurrentJobPage(prev => Math.min(totalPages, prev + 1))}
+                >Next &gt;</button>
               </div>
 
             </div>
