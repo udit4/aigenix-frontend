@@ -9,7 +9,8 @@ function AttendanceExtractor() {
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -21,6 +22,7 @@ function AttendanceExtractor() {
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
     } else if (e.type === 'dragleave') {
@@ -31,19 +33,28 @@ function AttendanceExtractor() {
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
     setDragActive(false);
+
     const files = [...e.dataTransfer.files];
-    const pdf = files.find(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'));
+
+    const pdf = files.find(
+      (f) => f.type === 'application/pdf' || f.name.endsWith('.pdf')
+    );
+
     if (pdf) {
       setPdfFile(pdf);
       setError(null);
     }
   };
 
-  const removePdf = () => setPdfFile(null);
+  const removePdf = () => {
+    setPdfFile(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!pdfFile) {
       setError('Please select a PDF file.');
       return;
@@ -56,21 +67,50 @@ function AttendanceExtractor() {
     setError(null);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/attendance/extract`, formData, {
-        responseType: 'blob',
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/attendance/extract`,
+        formData,
+        {
+          responseType: 'blob',
+        }
+      );
 
-      const url = URL.createObjectURL(response.data);
+      const url = window.URL.createObjectURL(
+        new Blob([response.data])
+      );
+
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'attendance_extracted.xlsx';
+      link.setAttribute('download', 'attendance_extracted.xlsx');
+
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.detail || 'Extraction failed. Please try again.');
+      console.error('Extraction Error:', err);
+
+      let errorMessage =
+        'Extraction failed. Large or unclear attendance sheets may exceed current AI parsing limits.';
+
+      // Try reading backend error message from blob response
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const parsed = JSON.parse(text);
+
+          if (parsed?.detail) {
+            errorMessage = parsed.detail;
+          }
+        } catch (parseError) {
+          console.error('Could not parse error blob:', parseError);
+        }
+      } else if (err.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -80,7 +120,12 @@ function AttendanceExtractor() {
     <div className="attendance-extractor">
       <div className="attendance-header">
         <h1>Attendance Sheet Extractor</h1>
-        <p>Upload a scanned PDF attendance sheet. The system extracts employee data, daily statuses, and summary totals into an Excel file.</p>
+
+        <p>
+          Upload a scanned PDF attendance sheet. The system extracts
+          employee data, attendance statuses, and summary totals into
+          an Excel file.
+        </p>
       </div>
 
       <div className="attendance-card">
@@ -90,8 +135,11 @@ function AttendanceExtractor() {
               <FileText size={18} />
               Attendance PDF
             </label>
+
             <div
-              className={`file-input-wrapper ${pdfFile ? 'has-file' : ''} ${dragActive ? 'drag-active' : ''}`}
+              className={`file-input-wrapper ${
+                pdfFile ? 'has-file' : ''
+              } ${dragActive ? 'drag-active' : ''}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -104,23 +152,37 @@ function AttendanceExtractor() {
                 id="pdf-upload"
                 disabled={loading}
               />
+
               <label htmlFor="pdf-upload" className="file-label">
                 {pdfFile ? (
-                  <span className="file-name">{pdfFile.name}</span>
+                  <span className="file-name">
+                    {pdfFile.name}
+                  </span>
                 ) : (
                   <>
                     <UploadCloud size={24} />
-                    <span>Choose PDF file or drag it here</span>
+                    <span>
+                      Choose PDF file or drag it here
+                    </span>
                   </>
                 )}
               </label>
             </div>
+
             {pdfFile && (
               <div className="file-list">
                 <div className="file-tag">
                   <FileText size={14} />
+
                   <span>{pdfFile.name}</span>
-                  <button type="button" onClick={removePdf} disabled={loading}>×</button>
+
+                  <button
+                    type="button"
+                    onClick={removePdf}
+                    disabled={loading}
+                  >
+                    ×
+                  </button>
                 </div>
               </div>
             )}
@@ -133,7 +195,11 @@ function AttendanceExtractor() {
             </div>
           )}
 
-          <button type="submit" className="submit-btn" disabled={loading}>
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={loading}
+          >
             {loading ? (
               <>
                 <Loader2 size={18} className="spinner" />
@@ -151,11 +217,32 @@ function AttendanceExtractor() {
 
       <div className="info-box">
         <h3>What this does</h3>
+
         <ul>
-          <li>Accepts scanned PDF attendance sheets (monthly tables).</li>
-          <li>Uses AI (GPT‑4o) to extract employee details, daily statuses (P/A/WO/H), and summary totals.</li>
-          <li>Outputs a clean Excel file with correct column ordering (1‑31 days, summary columns).</li>
-          <li>Handles both full matrices and single‑employee irregular sheets.</li>
+          <li>
+            Accepts scanned PDF attendance sheets.
+          </li>
+
+          <li>
+            Converts PDF pages into images and sends them to the AI
+            extraction pipeline.
+          </li>
+
+          <li>
+            Uses OpenAI vision models to extract employee details,
+            attendance statuses, and summary totals.
+          </li>
+
+          <li>
+            Generates a structured Excel output with day-wise columns
+            and summary fields.
+          </li>
+
+          <li>
+            Handles standard attendance sheets reliably. Very large,
+            low-quality, or dense sheets may require chunking or a
+            stronger vision model.
+          </li>
         </ul>
       </div>
     </div>
