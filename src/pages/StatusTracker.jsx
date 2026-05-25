@@ -9,7 +9,7 @@ function StatusTracker() {
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedGeo, setSelectedGeo] = useState('All');
-  const [selectedBU, setSelectedBU] = useState('All Projects');
+  const [selectedBU, setSelectedBU] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [kpiFilter, setKpiFilter] = useState('All');
 
@@ -30,18 +30,18 @@ function StatusTracker() {
     setError(null);
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
-      
+
       // We run the fetch and a 600ms minimum timeout concurrently.
       // This ensures the gorgeous loading overlay stays visible long enough for the user to register it!
       const [response] = await Promise.all([
         fetch(`${baseUrl}/status-tracker/refresh`),
         delay(600)
       ]);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch data: ${response.statusText}`);
       }
-      
+
       const result = await response.json();
       setData(result.data || []);
       setLastRefreshed(new Date());
@@ -59,9 +59,12 @@ function StatusTracker() {
 
   // Compute Metrics
   const totalInitiatives = data.length;
-  const activePOCs = data.filter(d => d['Paid Order'] && d['Paid Order'].includes('Active POC')).length;
+  const rfpsCount = data.filter(d => {
+    const engagements = d['Client Engagments'] || d['Client Engagements'];
+    return engagements && engagements.toLowerCase().includes('rfp');
+  }).length;
   const paidOrders = data.filter(d => d['Paid Order'] === 'Yes' || d['Paid Order'] === 'Paid').length;
-  
+
   // Compute unique Geos safely
   const uniqueGeos = new Set();
   data.forEach(d => {
@@ -72,35 +75,41 @@ function StatusTracker() {
     }
   });
 
-  // Dynamically compute Business Unit counts
-  const buCounts = { 'All Projects': data.length };
-  data.forEach(d => {
-    const bu = d['Business Unit'];
-    if (bu) {
-      buCounts[bu] = (buCounts[bu] || 0) + 1;
-    }
-  });
-  const uniqueBUs = Object.keys(buCounts).filter(k => k !== 'All Projects').sort();
-
-  const filteredData = data.filter(row => {
+  const dataWithoutBUFilter = data.filter(row => {
     const matchGeo = selectedGeo === 'All' || (row.Geo && row.Geo.split(',').map(g => g.trim()).includes(selectedGeo));
-    const matchBU = selectedBU === 'All Projects' || row['Business Unit'] === selectedBU;
-    
+
     let matchKpi = true;
-    if (kpiFilter === 'Active POC') {
-      matchKpi = row['Paid Order'] && row['Paid Order'].includes('Active POC');
+    if (kpiFilter === 'RFP') {
+      const engagements = row['Client Engagments'] || row['Client Engagements'];
+      matchKpi = engagements && engagements.toLowerCase().includes('rfp');
     } else if (kpiFilter === 'Paid Order') {
       matchKpi = row['Paid Order'] === 'Yes' || row['Paid Order'] === 'Paid';
     }
-    
+
     const query = searchQuery.toLowerCase();
-    const matchQuery = !query || 
+    const matchQuery = !query ||
       (row['Project Name'] && row['Project Name'].toLowerCase().includes(query)) ||
       (row['Business Unit'] && row['Business Unit'].toLowerCase().includes(query)) ||
       (row['Business Objective'] && row['Business Objective'].toLowerCase().includes(query)) ||
       (row['Working Team'] && row['Working Team'].toLowerCase().includes(query));
 
-    return matchGeo && matchBU && matchKpi && matchQuery;
+    return matchGeo && matchKpi && matchQuery;
+  });
+
+  // Dynamically compute Business Unit counts based on active filters (excluding BU filter)
+  const buCounts = { 'All': dataWithoutBUFilter.length };
+  dataWithoutBUFilter.forEach(d => {
+    const bu = d['Business Unit'];
+    if (bu) {
+      buCounts[bu] = (buCounts[bu] || 0) + 1;
+    }
+  });
+
+  // Keep all unique BUs visible as tabs even if current count is 0
+  const uniqueBUs = Array.from(new Set(data.map(d => d['Business Unit']).filter(Boolean))).sort();
+
+  const filteredData = dataWithoutBUFilter.filter(row => {
+    return selectedBU === 'All' || row['Business Unit'] === selectedBU;
   });
 
   return (
@@ -110,8 +119,8 @@ function StatusTracker() {
         <div className="overlay-loader">
           <div className="loader-box glass-panel">
             <RefreshCw size={36} className="spin" color="var(--accent-blue)" />
-            <h3 style={{marginTop: '20px', fontSize: '18px'}}>Syncing Database...</h3>
-            <p style={{color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px'}}>Fetching latest AIGenix initiatives</p>
+            <h3 style={{ marginTop: '20px', fontSize: '18px' }}>Syncing Database...</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px' }}>Fetching latest initiatives...</p>
           </div>
         </div>
       )}
@@ -119,22 +128,22 @@ function StatusTracker() {
       {/* HEADER */}
       <header className="app-header">
         <div className="header-title-container">
-          <div style={{background: 'rgba(62, 139, 255, 0.1)', padding: '8px', borderRadius: '8px'}}>
+          <div style={{ background: 'rgba(62, 139, 255, 0.1)', padding: '8px', borderRadius: '8px' }}>
             <Zap size={24} color="var(--accent-blue)" />
           </div>
           <h1 style={{ fontWeight: 800, fontSize: '24px', letterSpacing: '-0.5px' }}>
-            AIGeniX <span style={{fontWeight: 400, color: 'var(--text-muted)'}}>Initiative Tracker</span>
+            Digital Engineering, Data & AI <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>Key Updates</span>
           </h1>
         </div>
         <div className="header-actions">
-          <button 
-            onClick={() => setIsDarkMode(!isDarkMode)} 
-            style={{background: 'var(--bg-card)', border: '1px solid var(--border-glass)', padding: '8px', cursor: 'pointer', borderRadius: '8px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center'}}
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border-glass)', padding: '8px', cursor: 'pointer', borderRadius: '8px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}
             title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          
+
           <span className="last-refresh">
             Last refreshed: {format(lastRefreshed, 'hh:mm a, d MMM yyyy')}
           </span>
@@ -146,111 +155,112 @@ function StatusTracker() {
       </header>
 
       {error && (
-        <div style={{color: '#ff6b6b', padding: '16px', background: 'rgba(255,0,0,0.1)', border: '1px solid rgba(255,0,0,0.2)', borderRadius: '8px', fontSize: '14px'}}>
+        <div style={{ color: '#ff6b6b', padding: '16px', background: 'rgba(255,0,0,0.1)', border: '1px solid rgba(255,0,0,0.2)', borderRadius: '8px', fontSize: '14px' }}>
           ⚠️ {error}
         </div>
       )}
 
       {/* KPI DASHBOARD */}
       <section className="kpi-grid">
-        <div 
-          className="kpi-card glass-panel" 
-          style={{borderTop: '3px solid var(--accent-blue)', cursor: 'pointer', opacity: kpiFilter === 'All' ? 1 : 0.5, transition: 'opacity 0.2s'}}
+        <div
+          className="kpi-card glass-panel"
+          style={{ borderTop: '3px solid var(--accent-blue)', cursor: 'pointer', opacity: kpiFilter === 'All' ? 1 : 0.5, transition: 'opacity 0.2s' }}
           onClick={() => setKpiFilter('All')}
         >
           <h3 className="kpi-title">Total Initiatives</h3>
           <div className="kpi-value glow-blue">{totalInitiatives}</div>
           <p className="kpi-subtitle">Across all business units</p>
         </div>
-        
-        <div 
-          className="kpi-card glass-panel" 
-          style={{borderTop: '3px solid var(--accent-green)', cursor: 'pointer', opacity: kpiFilter === 'Active POC' ? 1 : (kpiFilter === 'All' ? 1 : 0.5), transition: 'opacity 0.2s', boxShadow: kpiFilter === 'Active POC' ? '0 0 15px rgba(16, 185, 129, 0.2)' : 'none'}}
-          onClick={() => setKpiFilter(kpiFilter === 'Active POC' ? 'All' : 'Active POC')}
+
+        <div
+          className="kpi-card glass-panel"
+          style={{ borderTop: '3px solid var(--accent-green)', cursor: 'pointer', opacity: kpiFilter === 'RFP' ? 1 : (kpiFilter === 'All' ? 1 : 0.5), transition: 'opacity 0.2s', boxShadow: kpiFilter === 'RFP' ? '0 0 15px rgba(16, 185, 129, 0.2)' : 'none' }}
+          onClick={() => setKpiFilter(kpiFilter === 'RFP' ? 'All' : 'RFP')}
         >
-          <h3 className="kpi-title">Active POCs</h3>
-          <div className="kpi-value glow-green">{activePOCs}</div>
-          <p className="kpi-subtitle">Currently in execution</p>
+          <h3 className="kpi-title">RFPs</h3>
+          <div className="kpi-value glow-green">{rfpsCount}</div>
+          <p className="kpi-subtitle">Proposals Ongoing</p>
         </div>
-        
-        <div 
-          className="kpi-card glass-panel" 
-          style={{borderTop: '3px solid var(--accent-yellow)', cursor: 'pointer', opacity: kpiFilter === 'Paid Order' ? 1 : (kpiFilter === 'All' ? 1 : 0.5), transition: 'opacity 0.2s', boxShadow: kpiFilter === 'Paid Order' ? '0 0 15px rgba(245, 158, 11, 0.2)' : 'none'}}
+
+        <div
+          className="kpi-card glass-panel"
+          style={{ borderTop: '3px solid var(--accent-yellow)', cursor: 'pointer', opacity: kpiFilter === 'Paid Order' ? 1 : (kpiFilter === 'All' ? 1 : 0.5), transition: 'opacity 0.2s', boxShadow: kpiFilter === 'Paid Order' ? '0 0 15px rgba(245, 158, 11, 0.2)' : 'none' }}
           onClick={() => setKpiFilter(kpiFilter === 'Paid Order' ? 'All' : 'Paid Order')}
         >
           <h3 className="kpi-title">Paid Orders</h3>
           <div className="kpi-value glow-yellow">{paidOrders}</div>
           <p className="kpi-subtitle">Revenue-generating projects</p>
         </div>
-        
-        <div className="kpi-card glass-panel" style={{borderTop: '3px solid var(--accent-purple)'}}>
-          <h3 className="kpi-title">Geos Active</h3>
-          <div className="kpi-value glow-purple">{uniqueGeos.size}</div>
-          <p className="kpi-subtitle" style={{textTransform: 'uppercase', fontSpacing: '1px'}}>
-            {Array.from(uniqueGeos).join(' • ') || 'Loading...'}
-          </p>
-        </div>
-      </section>
 
-      {/* GEO FILTER */}
-      <section style={{display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', flexWrap: 'wrap'}}>
-        <span style={{color: 'var(--text-muted)', fontSize: '14px', fontWeight: 600, marginRight: '4px', letterSpacing: '0.5px'}}>GEO:</span>
-        <button 
-          onClick={() => setSelectedGeo('All')}
-          style={{
-            background: selectedGeo === 'All' ? 'var(--accent-blue)' : 'var(--bg-card)',
-            color: selectedGeo === 'All' ? '#fff' : 'var(--text-muted)',
-            border: `1px solid ${selectedGeo === 'All' ? 'var(--accent-blue)' : 'var(--border-glass)'}`,
-            padding: '8px 24px', borderRadius: '24px', cursor: 'pointer', fontSize: '15px', fontWeight: 500, transition: 'all 0.2s', backdropFilter: 'blur(4px)'
-          }}
-        >
-          All
-        </button>
-        {Array.from(uniqueGeos).sort().map(geo => (
-          <button 
-            key={geo}
-            onClick={() => setSelectedGeo(geo)}
-            style={{
-              background: selectedGeo === geo ? 'var(--accent-blue)' : 'var(--bg-card)',
-              color: selectedGeo === geo ? '#fff' : 'var(--text-muted)',
-              border: `1px solid ${selectedGeo === geo ? 'var(--accent-blue)' : 'var(--border-glass)'}`,
-              padding: '8px 24px', borderRadius: '24px', cursor: 'pointer', fontSize: '15px', fontWeight: 500, transition: 'all 0.2s', backdropFilter: 'blur(4px)'
-            }}
-          >
-            {geo}
-          </button>
-        ))}
+        <div className="kpi-card glass-panel" style={{ borderTop: '3px solid var(--accent-purple)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <h3 className="kpi-title">Geos Active</h3>
+              <div className="kpi-value glow-purple">{uniqueGeos.size}</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
+            <select
+              value={selectedGeo}
+              onChange={(e) => setSelectedGeo(e.target.value)}
+              style={{
+                background: 'rgba(139, 92, 246, 0.1)',
+                color: 'var(--accent-purple)',
+                border: '1px solid rgba(139, 92, 246, 0.2)',
+                padding: '6px 28px 6px 12px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 600,
+                outline: 'none',
+                appearance: 'none',
+                width: '100%',
+                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+                backgroundSize: '14px'
+              }}
+            >
+              <option value="All">Filter by GEO: All</option>
+              {Array.from(uniqueGeos).sort().map(geo => (
+                <option key={geo} value={geo}>
+                  {geo}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </section>
 
       {/* DATA TABLE */}
       <section className="table-container glass-panel">
-        
+
         {/* BU TABS & SEARCH */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)', padding: '0 8px', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', overflowX: 'auto', flex: 1 }}>
-            <div 
-              onClick={() => setSelectedBU('All Projects')}
-              style={{ 
+            <div
+              onClick={() => setSelectedBU('All')}
+              style={{
                 padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
-                borderBottom: selectedBU === 'All Projects' ? '2px solid var(--accent-blue)' : '2px solid transparent',
-                color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
+                borderBottom: selectedBU === 'All' ? '2px solid var(--accent-blue)' : '2px solid transparent',
+                color: selectedBU === 'All' ? 'var(--accent-blue)' : 'var(--text-muted)',
                 fontWeight: 600, fontSize: '14px', transition: 'all 0.2s', whiteSpace: 'nowrap'
               }}
             >
-              All Projects
-              <span style={{ 
-                background: selectedBU === 'All Projects' ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
-                color: selectedBU === 'All Projects' ? 'var(--accent-blue)' : 'var(--text-muted)',
-                padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
+              All
+              <span style={{
+                background: selectedBU === 'All' ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'),
+                color: selectedBU === 'All' ? 'var(--accent-blue)' : 'var(--text-muted)',
+                padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700
               }}>
-                {buCounts['All Projects']}
+                {buCounts['All']}
               </span>
             </div>
             {uniqueBUs.map(bu => (
-              <div 
+              <div
                 key={bu}
                 onClick={() => setSelectedBU(bu)}
-                style={{ 
+                style={{
                   padding: '16px 20px', display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px',
                   borderBottom: selectedBU === bu ? '2px solid var(--accent-blue)' : '2px solid transparent',
                   color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
@@ -258,23 +268,23 @@ function StatusTracker() {
                 }}
               >
                 {bu}
-                <span style={{ 
-                  background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'), 
+                <span style={{
+                  background: selectedBU === bu ? 'rgba(62, 139, 255, 0.15)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'),
                   color: selectedBU === bu ? 'var(--accent-blue)' : 'var(--text-muted)',
-                  padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 
+                  padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700
                 }}>
-                  {buCounts[bu]}
+                  {buCounts[bu] || 0}
                 </span>
               </div>
             ))}
           </div>
-          
+
           <div style={{ padding: '0 16px', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.05)', border: '1px solid var(--accent-blue)', borderRadius: '12px', minWidth: '300px', margin: '8px 12px 8px 0' }}>
             <Search size={16} color="var(--text-muted)" />
             <div style={{ height: '20px', width: '1px', background: 'var(--border-glass)', margin: '0 12px' }}></div>
-            <input 
-              type="text" 
-              placeholder="Search projects..." 
+            <input
+              type="text"
+              placeholder="Search projects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
@@ -287,20 +297,20 @@ function StatusTracker() {
         <table className="data-table" style={{ marginTop: '0' }}>
           <thead>
             <tr>
-              <th style={{width: '18%'}}>Project</th>
-              <th style={{width: '22%'}}>Business Objective</th>
-              <th style={{width: '16%'}}>Client Engagements</th>
-              <th style={{width: '12%'}}>Status</th>
-              <th style={{width: '6%'}}>Paid</th>
-              <th style={{width: '10%'}}>Geo</th>
-              <th style={{width: '16%'}}>Team</th>
+              <th style={{ width: '18%' }}>Client Name</th>
+              <th style={{ width: '22%' }}>Business Objective</th>
+              <th style={{ width: '16%' }}>Client Engagements</th>
+              <th style={{ width: '12%' }}>Status</th>
+              <th style={{ width: '6%' }}>Paid</th>
+              <th style={{ width: '10%' }}>Geo</th>
+              <th style={{ width: '16%' }}>Team</th>
             </tr>
           </thead>
           <tbody>
             {loading && data.length === 0 ? (
-              <tr><td colSpan="7" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>Fetching tracker data...</td></tr>
+              <tr><td colSpan="7" style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>Fetching tracker data...</td></tr>
             ) : filteredData.length === 0 ? (
-               <tr><td colSpan="7" style={{textAlign: 'center', padding: '60px', color: 'var(--text-muted)'}}>No initiatives found.</td></tr>
+              <tr><td colSpan="7" style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>No initiatives found.</td></tr>
             ) : (
               filteredData.map((row, idx) => (
                 <tr key={idx}>
@@ -314,7 +324,7 @@ function StatusTracker() {
                     </div>
                   </td>
                   <td>
-                    <div className="business-obj" style={{fontSize: '13px'}}>
+                    <div className="business-obj" style={{ fontSize: '13px' }}>
                       {row['Client Engagments'] || row['Client Engagements'] || '-'}
                     </div>
                   </td>
@@ -331,10 +341,10 @@ function StatusTracker() {
                           {row.Status}
                         </div>
                       ) : (
-                        <span style={{color: 'var(--text-muted)'}}>{row.Status}</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{row.Status}</span>
                       )
                     ) : (
-                      <span style={{color: 'var(--text-muted)'}}>-</span>
+                      <span style={{ color: 'var(--text-muted)' }}>-</span>
                     )}
                   </td>
                   <td>
@@ -345,20 +355,20 @@ function StatusTracker() {
                           {row['Paid Order']}
                         </div>
                       ) : (
-                        <span style={{color: 'var(--text-muted)'}}>{row['Paid Order']}</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{row['Paid Order']}</span>
                       )
                     ) : (
-                      <span style={{color: 'var(--text-muted)'}}>-</span>
+                      <span style={{ color: 'var(--text-muted)' }}>-</span>
                     )}
                   </td>
                   <td>
                     {row.Geo ? (
-                      <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap'}}>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                         {row.Geo.split(',').map(g => (
                           <span key={g.trim()} className="geo-tag">{g.trim()}</span>
                         ))}
                       </div>
-                    ) : <span style={{color: 'var(--text-muted)'}}>-</span>}
+                    ) : <span style={{ color: 'var(--text-muted)' }}>-</span>}
                   </td>
                   <td>
                     <div className="team-details">{row['Working Team'] || '-'}</div>

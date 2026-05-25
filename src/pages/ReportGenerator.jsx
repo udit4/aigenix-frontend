@@ -66,8 +66,8 @@ function ReportGenerator() {
 
   const downloadSampleExcel = () => {
     const link = document.createElement('a');
-    link.href = '/sample_excel_final.xlsx';
-    link.download = 'sample_excel_final.xlsx';
+    link.href = '/sample_excel.xlsx';
+    link.download = 'sample_excel.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -96,7 +96,7 @@ function ReportGenerator() {
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/report/generate', formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/report/generate`, formData);
       const { matched, unmatched } = response.data;
 
       if (matched && matched.data) {
@@ -117,7 +117,7 @@ function ReportGenerator() {
     <div className="rg-layout">
       <main className="rg-main">
         <div className="rg-page-header">
-          <h1>Excel‑PDF Report Generator</h1>
+          <h1>MAHA IT Invoicing Automation</h1>
           <p>Upload your Excel master and BCTPL/TNMAS PDFs to generate matched reports.</p>
           <button
             type="button"
