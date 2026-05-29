@@ -1,0 +1,182 @@
+.otl-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #07111f, #0d1b2a, #102b42);
+  padding: 40px 20px;
+  color: white;
+}
+
+.otl-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.otl-header-card,
+.upload-card,
+.file-info-card,
+.processing-card,
+.error-card,
+.success-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.otl-header-card h1 {
+  font-size: 40px;
+  margin-bottom: 14px;
+}
+
+.otl-header-card p {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.7;
+}
+
+.otl-badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0ea5e9, #14b8a6);
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.upload-card {
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.drag-active {
+  transform: scale(1.01);
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.upload-icon {
+  font-size: 54px;
+  margin-bottom: 14px;
+  animation: float 2s infinite ease-in-out;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.browse-btn,
+.process-btn,
+.download-btn {
+  background: linear-gradient(135deg, #0ea5e9, #14b8a6);
+  border: none;
+  padding: 14px 22px;
+  border-radius: 14px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.browse-btn:hover,
+.process-btn:hover,
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(20, 184, 166, 0.3);
+}
+
+.process-btn {
+  width: 100%;
+  font-size: 16px;
+}
+
+.process-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.file-info-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clear-btn,
+.reset-link {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.processing-card,
+.success-card,
+.error-card {
+  text-align: center;
+}
+
+.loader {
+  width: 70px;
+  height: 70px;
+  border: 6px solid rgba(255, 255, 255, 0.12);
+  border-top: 6px solid #14b8a6;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-card {
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.error-card {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.error-card p {
+  color: #fecaca;
+}
+
+@media (max-width: 768px) {
+  .otl-header-card h1 {
+    font-size: 30px;
+  }
+
+  .file-info-card {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}
+
+.otl-upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .otl-upload-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -6,6 +6,7 @@ import AttendanceExtractor from './pages/AttendanceExtractor';
 import RojgarJobseeker from './pages/RojgarJobseeker';
 import AdminDashboard from './pages/AdminDashboard';
 import TemenosChatbot from './pages/TemenosChatbot';
+import OtlAutomation from "./pages/OtlAutomation";
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <Route path="/rojgar-jobseeker" element={<RojgarJobseeker />} />
       <Route path="/rojgar-admin" element={<AdminDashboard />} />
       <Route path="/chatbot/temenos" element={<TemenosChatbot />} />
+      <Route path="/otl-automation" element={<OtlAutomation />} />
     </Routes>
   );
 }
