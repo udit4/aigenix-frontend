@@ -15,11 +15,19 @@ const PROCESSING_STEPS = [
 export default function OtlAutomation() {
   const ghcInputRef = useRef(null);
   const rafInputRef = useRef(null);
+  const termInputRef = useRef(null);
+  const calInputRef = useRef(null);
 
   const [ghcFile, setGhcFile] = useState(null);
   const [rafFile, setRafFile] = useState(null);
+  const [termFile, setTermFile] = useState(null);
+  const [calFile, setCalFile] = useState(null);
+
   const [ghcDragActive, setGhcDragActive] = useState(false);
   const [rafDragActive, setRafDragActive] = useState(false);
+  const [termDragActive, setTermDragActive] = useState(false);
+  const [calDragActive, setCalDragActive] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -41,8 +49,12 @@ export default function OtlAutomation() {
   const resetState = () => {
     setGhcFile(null);
     setRafFile(null);
+    setTermFile(null);
+    setCalFile(null);
     setGhcDragActive(false);
     setRafDragActive(false);
+    setTermDragActive(false);
+    setCalDragActive(false);
     setLoading(false);
     setSuccess(false);
     setError("");
@@ -72,6 +84,20 @@ export default function OtlAutomation() {
     setRafFile(file);
   };
 
+  const handleTermFile = (file) => {
+    if (!validateFile(file)) return;
+    setError("");
+    setSuccess(false);
+    setTermFile(file);
+  };
+
+  const handleCalFile = (file) => {
+    if (!validateFile(file)) return;
+    setError("");
+    setSuccess(false);
+    setCalFile(file);
+  };
+
   const handleUpload = async () => {
     if (!ghcFile || !rafFile) {
       setError("Please select both GHC and RAF Excel files.");
@@ -96,6 +122,12 @@ export default function OtlAutomation() {
       const formData = new FormData();
       formData.append("ghc_file", ghcFile);
       formData.append("raf_file", rafFile);
+      if (termFile) {
+        formData.append("termination_file", termFile);
+      }
+      if (calFile) {
+        formData.append("master_calendar_file", calFile);
+      }
 
       const response = await fetch(API_URL, {
         method: "POST",
@@ -151,9 +183,8 @@ export default function OtlAutomation() {
           <h1>OTL Excel Processor</h1>
 
           <p>
-            Upload your GHC and RAF Excel files. The system dynamically reads
-            template mappings, validates exact column headers, and merges/consolidates
-            records based on the (Employee ID, Project ID) composite key.
+            Upload your GHC and RAF Excel files. You can optionally upload Termination 
+            and Master Calendar workbooks to enrich Last Working Day (LWD) and calendar descriptions.
           </p>
         </div>
 
@@ -245,6 +276,94 @@ export default function OtlAutomation() {
               }}
             />
           </div>
+
+          {/* Termination Upload */}
+          <div
+            className={`upload-card ${termDragActive ? "drag-active" : ""}`}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setTermDragActive(true);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setTermDragActive(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setTermDragActive(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setTermDragActive(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) handleTermFile(file);
+            }}
+          >
+            <div className="upload-icon">🛑</div>
+            <h2>Termination Sheet (Optional)</h2>
+            <p>Drag & drop Termination file or click to browse.</p>
+            <button
+              className="browse-btn"
+              onClick={() => termInputRef.current?.click()}
+            >
+              Browse Termination
+            </button>
+            <input
+              ref={termInputRef}
+              type="file"
+              accept=".xlsx"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleTermFile(file);
+              }}
+            />
+          </div>
+
+          {/* Master Calendar Upload */}
+          <div
+            className={`upload-card ${calDragActive ? "drag-active" : ""}`}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setCalDragActive(true);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setCalDragActive(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setCalDragActive(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setCalDragActive(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) handleCalFile(file);
+            }}
+          >
+            <div className="upload-icon">📅</div>
+            <h2>Master Calendar (Optional)</h2>
+            <p>Drag & drop Master Calendar file or click to browse.</p>
+            <button
+              className="browse-btn"
+              onClick={() => calInputRef.current?.click()}
+            >
+              Browse Calendar
+            </button>
+            <input
+              ref={calInputRef}
+              type="file"
+              accept=".xlsx"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleCalFile(file);
+              }}
+            />
+          </div>
         </div>
 
         {ghcFile && (
@@ -267,6 +386,30 @@ export default function OtlAutomation() {
             </div>
             <button className="clear-btn" onClick={() => setRafFile(null)}>
               Clear RAF
+            </button>
+          </div>
+        )}
+
+        {termFile && (
+          <div className="file-info-card">
+            <div>
+              <h3>Termination: {termFile.name}</h3>
+              <span>{formatFileSize(termFile.size)}</span>
+            </div>
+            <button className="clear-btn" onClick={() => setTermFile(null)}>
+              Clear Termination
+            </button>
+          </div>
+        )}
+
+        {calFile && (
+          <div className="file-info-card">
+            <div>
+              <h3>Master Calendar: {calFile.name}</h3>
+              <span>{formatFileSize(calFile.size)}</span>
+            </div>
+            <button className="clear-btn" onClick={() => setCalFile(null)}>
+              Clear Calendar
             </button>
           </div>
         )}
